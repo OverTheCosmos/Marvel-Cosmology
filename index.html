@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmology Map — Planes of Existence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050508;
+    --gold:#E9D24C;
+    --white-hot:#F4F2E8;
+    --green-land:#3FDE8A;
+    --indigo:#8B90FF;
+    --overspace:#D9DAE4;
+    --outside:#9CA0AA;
+    --far-shore:#3A5FA0;
+    --outer-void:#B98CE8;
+    --neutral:#4C7BFF;
+    --super-flow:#E14D5D;
+    --deep-space:#C24FDE;
+    --earth-planes:#7FB8FF;
+    --deaths-realm:#9A3348;
+    --below:#33FF8C;
+    --mystery:#CFD2E0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at 50% 0%, #0c0c14 0%, var(--bg) 55%, #020203 100%);
+    color:var(--white-hot);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+    position:relative;
+  }
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;}
+
+  header{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:56px 20px 30px;
+  }
+  header .eyebrow{
+    font-size:12px;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:#8b8ba0;
+    margin:0 0 10px;
+  }
+  header h1{
+    font-family:'Cinzel',serif;
+    font-weight:700;
+    font-size:clamp(26px,5vw,44px);
+    margin:0;
+    background:linear-gradient(180deg,#fffef2,#c9c48a);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:.02em;
+  }
+  header p{
+    max-width:560px;
+    margin:16px auto 0;
+    color:#a9a9b8;
+    font-size:14.5px;
+    line-height:1.6;
+  }
+  header .hint{
+    margin-top:18px;
+    font-size:12.5px;
+    color:#7a7a90;
+    font-style:italic;
+  }
+
+  main{
+    position:relative;
+    z-index:2;
+    max-width:720px;
+    margin:0 auto;
+    padding:20px 20px 120px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .connector{
+    width:2px;
+    height:56px;
+    background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.08));
+  }
+
+  .group-tag{
+    font-family:'Cinzel',serif;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    padding:6px 16px;
+    border-radius:20px;
+    border:1px solid currentColor;
+    margin:10px 0 22px;
+    text-align:center;
+  }
+
+  .mystery-wrap{
+    position:relative;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .mystery-box{
+    position:relative;
+    border:2px dashed rgba(200,200,220,.35);
+    border-radius:24px;
+    padding:140px 24px 34px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:100%;
+    cursor:pointer;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .mystery-box:hover, .mystery-box:focus-visible{
+    border-color:var(--mystery);
+    box-shadow:0 0 26px -8px var(--mystery);
+    outline:none;
+  }
+  .mystery-box.active{
+    border-color:var(--mystery);
+    box-shadow:0 0 34px -4px var(--mystery);
+  }
+
+  .node{
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.05), rgba(0,0,0,0) 70%);
+    border:2px solid var(--c);
+    box-shadow:0 0 18px -2px var(--c), inset 0 0 14px -6px var(--c);
+    transition:transform .18s ease, box-shadow .18s ease;
+    padding:10px;
+    position:relative;
+  }
+  .node:hover, .node:focus-visible{
+    transform:scale(1.045);
+    box-shadow:0 0 30px 0px var(--c), inset 0 0 18px -4px var(--c);
+    outline:none;
+  }
+  .node.active{
+    box-shadow:0 0 40px 4px var(--c), inset 0 0 20px -2px var(--c);
+    transform:scale(1.06);
+  }
+  .node .label{
+    font-family:'Cinzel',serif;
+    font-weight:700;
+    color:var(--c);
+    text-shadow:0 0 10px var(--c);
+    line-height:1.25;
+  }
+
+  .n-whr{width:176px;height:176px;font-size:14.5px;}
+  .n-land{width:140px;height:140px;font-size:12px;}
+  .n-star{width:170px;height:170px;font-size:14px;}
+  .n-over{width:190px;height:190px;font-size:14.5px;}
+  .n-below{width:250px;height:250px;font-size:19px;}
+
+  /* House of Ideas — a gate of light straddling the top of the Mystery box */
+  .n-house{
+    width:196px;height:196px;font-size:16px;
+    position:absolute;
+    top:-60px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:4;
+    box-shadow:0 0 50px 6px var(--c), 0 0 110px 30px rgba(233,210,76,.32), inset 0 0 24px -4px var(--c);
+  }
+  .n-house:hover, .n-house:focus-visible{
+    transform:translateX(-50%) scale(1.045);
+    box-shadow:0 0 64px 8px var(--c), 0 0 130px 36px rgba(233,210,76,.4), inset 0 0 26px -4px var(--c);
+    outline:none;
+  }
+  .n-house.active{
+    transform:translateX(-50%) scale(1.06);
+    box-shadow:0 0 70px 10px var(--c), 0 0 140px 40px rgba(233,210,76,.45), inset 0 0 28px -2px var(--c);
+  }
+  .light-beam{
+    position:absolute;
+    top:-124px;
+    left:50%;
+    width:3px;
+    height:64px;
+    transform:translateX(-50%);
+    background:linear-gradient(to bottom, rgba(233,210,76,0), var(--gold));
+    opacity:.75;
+    pointer-events:none;
+  }
+
+  .cluster-wrap{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin:10px 0;
+  }
+  .ring{
+    border-radius:50%;
+    border:2px solid var(--c);
+    box-shadow:0 0 18px -3px var(--c), inset 0 0 16px -8px var(--c);
+    position:relative;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .ring:hover, .ring:focus-visible{box-shadow:0 0 26px -2px var(--c), inset 0 0 18px -6px var(--c); outline:none;}
+  .ring.active{box-shadow:0 0 36px 2px var(--c), inset 0 0 20px -4px var(--c);}
+  .ring .ring-label{
+    position:absolute;
+    top:8%;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:'Cinzel',serif;
+    font-weight:700;
+    color:var(--c);
+    text-shadow:0 0 8px var(--c);
+    white-space:nowrap;
+    pointer-events:none;
+  }
+  .mini{
+    position:absolute;
+    border-radius:50%;
+    border:2px solid var(--c);
+    box-shadow:0 0 12px -2px var(--c), inset 0 0 10px -6px var(--c);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    font-family:'Cinzel',serif;
+    font-weight:700;
+    font-size:10.5px;
+    color:var(--c);
+    text-shadow:0 0 6px var(--c);
+    padding:6px;
+    line-height:1.15;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .mini:hover, .mini.active{transform:scale(1.08); box-shadow:0 0 20px 0 var(--c);}
+
+  /* --- The Outside: two separate, non-overlapping realms fully inside the ring --- */
+  .outside-stack{position:relative; width:300px; height:300px;}
+  .outside-ring{
+    --c:var(--outside);
+    width:300px;height:300px;
+    position:absolute; top:0; left:0;
+  }
+  .shore-mini{width:92px;height:92px;--c:var(--far-shore); left:49px; top:149px;}
+  .void-mini{width:92px;height:92px;--c:var(--outer-void); left:159px; top:149px;}
+
+  /* --- Eternity's Influence: true concentric rings, centered --- */
+  .concentric{position:relative; width:400px; height:400px;}
+  .concentric .ring{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);}
+  .neutral-ring{--c:var(--neutral); width:400px; height:400px;}
+  .neutral-ring .ring-label{top:3%;}
+  .flow-ring{--c:var(--super-flow); width:330px; height:330px;}
+  .deep-ring{--c:var(--deep-space); width:230px; height:230px;}
+  .earth-mini{width:78px;height:78px;--c:var(--earth-planes); bottom:12px; left:50%; transform:translateX(-50%);}
+  .death-mini{width:74px;height:74px;--c:var(--deaths-realm); top:44px; right:10px;}
+
+  .eternity-tag{align-self:flex-start; margin-left:64px;}
+
+  footer{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:20px 20px 60px;
+    color:#66667a;
+    font-size:12px;
+  }
+
+  #panel-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(2px);
+    z-index:9;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  #panel-overlay.show{opacity:1; pointer-events:auto;}
+
+  #panel{
+    position:fixed;
+    z-index:10;
+    background:#0d0d14;
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 0 50px rgba(0,0,0,.6);
+    transition:transform .3s cubic-bezier(.22,1,.36,1);
+  }
+  @media (min-width:760px){
+    #panel{
+      top:0; right:0; height:100%; width:380px;
+      transform:translateX(100%);
+      border-left:1px solid rgba(255,255,255,.12);
+      border-top:none;
+    }
+    #panel.show{transform:translateX(0);}
+  }
+  @media (max-width:759px){
+    #panel{
+      left:0; right:0; bottom:0; width:100%; max-height:78vh;
+      transform:translateY(100%);
+      border-top:1px solid rgba(255,255,255,.12);
+      border-radius:20px 20px 0 0;
+      overflow-y:auto;
+    }
+    #panel.show{transform:translateY(0);}
+  }
+
+  #panel-inner{padding:30px 26px 40px;}
+  #panel .close-btn{
+    position:absolute;
+    top:16px;
+    right:18px;
+    background:none;
+    border:none;
+    color:#8a8a9a;
+    font-size:22px;
+    cursor:pointer;
+    line-height:1;
+    padding:4px;
+  }
+  #panel .close-btn:hover{color:#fff;}
+  #panel .p-tag{
+    display:inline-block;
+    font-family:'Cinzel',serif;
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    padding:4px 12px;
+    border-radius:14px;
+    border:1px solid var(--c);
+    color:var(--c);
+    margin-bottom:16px;
+  }
+  #panel h2{
+    font-family:'Cinzel',serif;
+    font-size:23px;
+    margin:0 0 16px;
+    color:var(--c);
+    text-shadow:0 0 14px var(--c);
+    line-height:1.3;
+    padding-right:20px;
+  }
+  #panel p.desc{
+    font-size:15px;
+    line-height:1.75;
+    color:#d3d3e0;
+    margin:0;
+  }
+  #panel .divider{
+    width:36px;
+    height:2px;
+    background:var(--c);
+    margin:18px 0;
+    box-shadow:0 0 8px var(--c);
+  }
+  #panel .breadcrumb{
+    font-size:12px;
+    color:#797990;
+    letter-spacing:.02em;
+  }
+
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<h1 class="sr-only">Interactive map of the dimensions and planes of existence, from the Below Place at the very bottom up to the House of Ideas at the very top, passing through the Multiverse, the Outside, and the Mystery. Click any circle to read its description.</h1>
+
+<canvas id="stars"></canvas>
+
+<header>
+  <p class="eyebrow">Game cosmology</p>
+  <h1>Planes of existence &amp; dimensions</h1>
+  <p>A hierarchy of realms, from the deepest Below Place up to the House of Ideas at the very top. Each circle is a plane of existence.</p>
+  <p class="hint">Tap or click a circle to read its description.</p>
+</header>
+
+<main>
+
+  <div class="group-tag" style="color:var(--mystery);border-color:var(--mystery);">The Mystery</div>
+  <div class="mystery-wrap">
+    <div class="mystery-box" data-id="mystery" tabindex="0" role="button">
+      <div class="light-beam"></div>
+      <div class="node n-house" style="--c:var(--gold);" data-id="house" tabindex="0" role="button">
+        <span class="label">House of<br>Ideas</span>
+      </div>
+      <div class="connector"></div>
+      <div class="node n-whr" style="--c:var(--white-hot);" data-id="whr" tabindex="0" role="button">
+        <span class="label">White Hot<br>Room</span>
+      </div>
+      <div class="connector"></div>
+      <div class="node n-land" style="--c:var(--green-land);" data-id="land" tabindex="0" role="button">
+        <span class="label">Land of Couldn't-Be-<br>Shouldn't-Be</span>
+      </div>
+      <div class="connector"></div>
+      <div class="node n-star" style="--c:var(--indigo);" data-id="star" tabindex="0" role="button">
+        <span class="label">Star<br>Chamber</span>
+      </div>
+      <div class="connector"></div>
+      <div class="node n-over" style="--c:var(--overspace);" data-id="over" tabindex="0" role="button">
+        <span class="label">OverSpace</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"></div>
+
+  <div class="group-tag" style="color:var(--outside);border-color:var(--outside);">The Outside</div>
+  <div class="cluster-wrap">
+    <div class="outside-stack">
+      <div class="ring outside-ring" data-id="outside" tabindex="0" role="button">
+        <span class="ring-label">The Outside</span>
+      </div>
+      <div class="mini shore-mini" data-id="shore" tabindex="0" role="button">Far<br>Shore</div>
+      <div class="mini void-mini" data-id="void" tabindex="0" role="button">Oblivion<br>Realm</div>
+    </div>
+  </div>
+
+  <div class="connector"></div>
+
+  <div class="group-tag eternity-tag" style="color:var(--neutral);border-color:var(--neutral);">Eternity's Influence</div>
+  <div class="cluster-wrap">
+    <div class="concentric">
+      <div class="ring neutral-ring" data-id="neutral" tabindex="0" role="button">
+        <span class="ring-label">Neutral Zone</span>
+      </div>
+      <div class="ring flow-ring" data-id="flow" tabindex="0" role="button">
+        <span class="ring-label">Super Flow</span>
+        <div class="mini death-mini" data-id="death" tabindex="0" role="button">Death's<br>Realm</div>
+      </div>
+      <div class="ring deep-ring" data-id="deep" tabindex="0" role="button">
+        <span class="ring-label">The Deep Space</span>
+        <div class="mini earth-mini" data-id="earth" tabindex="0" role="button">Earth<br>Planes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"></div>
+
+  <div class="group-tag" style="color:var(--below);border-color:var(--below);">The Below Realm</div>
+  <div class="node n-below" style="--c:var(--below);" data-id="below" tabindex="0" role="button">
+    <span class="label">THE BELOW<br>PLACE</span>
+  </div>
+
+</main>
+
+<footer>Click elsewhere or the close button to dismiss a card.</footer>
+
+<div id="panel-overlay"></div>
+<div id="panel" style="--c:var(--white-hot);">
+  <div id="panel-inner">
+    <button class="close-btn" aria-label="Close">&times;</button>
+    <div class="p-tag" id="p-tag">Category</div>
+    <h2 id="p-title">Title</h2>
+    <p class="breadcrumb" id="p-breadcrumb"></p>
+    <div class="divider"></div>
+    <p class="desc" id="p-desc">Description</p>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  mystery: {
+    title:"The Mystery",
+    tag:"Category",
+    crumb:"Encompassing House of Ideas, White Hot Room, the Land of Couldn't-Be-Shouldn't-Be, Star Chamber and OverSpace",
+    color:"var(--mystery)",
+    desc:"Beyond Every Realities and the outside area stand the Mystery."
+  },
+  house: {
+    title:"House of Ideas",
+    tag:"The Mystery",
+    crumb:"The topmost realm, beyond every reality",
+    color:"var(--gold)",
+    desc:"The birthplace of all ideas, narratives & Stories. The House of The One Above All."
+  },
+  whr: {
+    title:"White Hot Room",
+    tag:"The Mystery",
+    crumb:"Below the House of Ideas",
+    color:"var(--white-hot)",
+    desc:"Known as the Forge Of Creation. The Home Of The Phoenix Force itself."
+  },
+  land: {
+    title:"Land of Couldn't-Be-Shouldn't-Be",
+    tag:"The Mystery",
+    crumb:"Below the White Hot Room",
+    color:"var(--green-land)",
+    desc:"The realm of impossible ideas and forgotten possibilities."
+  },
+  star: {
+    title:"Star Chamber",
+    tag:"The Mystery",
+    crumb:"Below the Land of Couldn't-Be-Shouldn't-Be",
+    color:"var(--indigo)",
+    desc:"Place where the living tribunal operate and judge."
+  },
+  over: {
+    title:"OverSpace",
+    tag:"The Mystery",
+    crumb:"Below the Star Chamber, bordering the Outside",
+    color:"var(--overspace)",
+    desc:"Space above realities where abstract entities manifest themself under their physical form."
+  },
+  outside: {
+    title:"The Outside",
+    tag:"The Planes Out Of The Multiverse",
+    crumb:"Between the Mystery and the Multiverse",
+    color:"var(--outside)",
+    desc:"Beyond every reality and the outside area stand the Mystery. The Outside holds the planes that lie out of the Multiverse."
+  },
+  void: {
+    title:"Oblivion Realm",
+    tag:"The Outside",
+    crumb:"Inside The Outside",
+    color:"var(--outer-void)",
+    desc:"The realm of Oblivion, embodying absolute nothingness and non-existence."
+  },
+  shore: {
+    title:"Far Shore",
+    tag:"The Outside",
+    crumb:"Inside The Outside",
+    color:"var(--far-shore)",
+    desc:"The shore beyond the Multiverse, where former realities and cosmic beings come to rest before the Mystery."
+  },
+  neutral: {
+    title:"Neutral Zone",
+    tag:"Eternity's Influence",
+    crumb:"Outer border of the Multiverse",
+    color:"var(--neutral)",
+    desc:"Space where matter and antimatter coexist. The Last Place before time, space, life & death cease to exist. Border of the multiverse."
+  },
+  flow: {
+    title:"Super Flow",
+    tag:"Eternity's Influence",
+    crumb:"Inside the Neutral Zone",
+    color:"var(--super-flow)",
+    desc:"The Space between universes & Reality. It's where dreams, ideas and telepathy operates."
+  },
+  death: {
+    title:"Death's Realm",
+    tag:"Super Flow",
+    crumb:"Inside the Super Flow",
+    color:"var(--deaths-realm)",
+    desc:"Realm of Lady Death."
+  },
+  deep: {
+    title:"The Deep Space",
+    tag:"Super Flow",
+    crumb:"At the heart of the Multiverse",
+    color:"var(--deep-space)",
+    desc:"The Space where stars, planet, matter, time & space Exist."
+  },
+  earth: {
+    title:"Earth Planes",
+    tag:"The Deep Space",
+    crumb:"Sub dimension of the Deep Space",
+    color:"var(--earth-planes)",
+    desc:"Sub Dimension of the deep space where Astral Plane, Limbo, Asgard dimensions remains."
+  },
+  below: {
+    title:"The Below Place",
+    tag:"The Below Realm",
+    crumb:"Before The Creations There is the Below Realm",
+    color:"var(--below)",
+    desc:"The deepest realm beneath all existence, where destruction and the One Below All reside."
+  }
+};
+
+const panel = document.getElementById('panel');
+const overlay = document.getElementById('panel-overlay');
+const pTag = document.getElementById('p-tag');
+const pTitle = document.getElementById('p-title');
+const pDesc = document.getElementById('p-desc');
+const pCrumb = document.getElementById('p-breadcrumb');
+let activeEl = null;
+
+function openPanel(id, el){
+  const d = DATA[id];
+  if(!d) return;
+  if(activeEl) activeEl.classList.remove('active');
+  activeEl = el;
+  el.classList.add('active');
+  panel.style.setProperty('--c', d.color);
+  pTag.textContent = d.tag;
+  pTitle.textContent = d.title;
+  pDesc.textContent = d.desc;
+  pCrumb.textContent = d.crumb;
+  panel.classList.add('show');
+  overlay.classList.add('show');
+}
+function closePanel(){
+  panel.classList.remove('show');
+  overlay.classList.remove('show');
+  if(activeEl){ activeEl.classList.remove('active'); activeEl = null; }
+}
+
+document.querySelectorAll('[data-id]').forEach(el=>{
+  el.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    openPanel(el.dataset.id, el);
+  });
+  el.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      e.stopPropagation();
+      openPanel(el.dataset.id, el);
+    }
+  });
+});
+document.querySelector('.close-btn').addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closePanel(); });
+
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = document.body.scrollHeight;
+}
+function drawStars(){
+  resizeCanvas();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const count = Math.floor((canvas.width*canvas.height)/9000);
+  for(let i=0;i<count;i++){
+    const x = Math.random()*canvas.width;
+    const y = Math.random()*canvas.height;
+    const r = Math.random()*1.1 + 0.2;
+    const a = Math.random()*0.6 + 0.15;
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.fill();
+  }
+}
+drawStars();
+window.addEventListener('resize', ()=>{ clearTimeout(window._rt); window._rt = setTimeout(drawStars,200); });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marvel Cosmology — Verse Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050508;
+    --gold:#E9D24C;
+    --violet:#8B90FF;
+    --text:#EDEBF7;
+    --text-dim:#8B8AA0;
+    --line:#2A2F42;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at 50% 0%, #0c0c14 0%, var(--bg) 55%, #020203 100%);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+    position:relative;
+  }
+
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;}
+  #trail{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width:920px;
+    margin:0 auto;
+    padding:70px 24px 90px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin:0 0 16px;
+  }
+
+  h1{
+    font-family:'Cinzel',serif;
+    font-weight:700;
+    font-size:clamp(30px,5.4vw,52px);
+    margin:0;
+    line-height:1.15;
+    background:linear-gradient(180deg,#fffef2 10%,#c9c48a 60%,#8f7f4a 130%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    letter-spacing:.01em;
+  }
+  h1 .sub{
+    display:block;
+    font-size:.42em;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    margin-top:14px;
+    background:linear-gradient(180deg,#c9c8dc,#7b7a94);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .lede{
+    max-width:560px;
+    margin:22px auto 0;
+    color:var(--text-dim);
+    font-size:14.5px;
+    line-height:1.7;
+  }
+
+  .switcher{
+    position:relative;
+    z-index:2;
+    display:inline-flex;
+    gap:6px;
+    margin:44px auto 0;
+    padding:6px;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line);
+    border-radius:16px;
+  }
+  .tab{
+    position:relative;
+    font-family:'Cinzel',serif;
+    font-weight:600;
+    font-size:13.5px;
+    letter-spacing:.03em;
+    color:var(--text-dim);
+    background:transparent;
+    border:none;
+    padding:13px 24px;
+    border-radius:11px;
+    cursor:pointer;
+    transition:color .25s ease;
+  }
+  .tab .tag{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    opacity:.7;
+    margin-top:4px;
+    font-weight:400;
+  }
+  .tab.active{color:#fff;}
+  .tab.active .tag{opacity:.95;}
+  .tab-glow{
+    position:absolute;
+    top:6px; bottom:6px;
+    border-radius:11px;
+    background:linear-gradient(180deg, rgba(139,144,255,.22), rgba(139,144,255,.05));
+    border:1px solid rgba(139,144,255,.5);
+    box-shadow:0 0 24px -4px rgba(139,144,255,.6);
+    transition:transform .35s cubic-bezier(.22,1,.36,1), width .35s cubic-bezier(.22,1,.36,1);
+    pointer-events:none;
+  }
+
+  .stage{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:1100px;
+    margin:38px auto 0;
+    padding:0 20px;
+  }
+  .frame-wrap{
+    position:relative;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:#07070d;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,.8), inset 0 0 60px rgba(139,144,255,.03);
+    overflow:hidden;
+  }
+  .frame-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:.04em;
+  }
+  .frame-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--line);}
+  .frame-bar .path{margin-left:8px;}
+  iframe{
+    display:block;
+    width:100%;
+    height:82vh;
+    min-height:560px;
+    border:none;
+    background:#050508;
+  }
+
+  footer{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:26px 20px 60px;
+    color:#54546a;
+    font-size:11.5px;
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.04em;
+  }
+
+  @media (max-width:640px){
+    .switcher{flex-direction:column; width:100%; max-width:340px;}
+    .tab{width:100%;}
+    .tab-glow{left:6px !important; right:6px; width:auto !important;}
+    iframe{height:70vh;}
+  }
+</style>
+</head>
+<body>
+
+<h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Marvel Cosmology Verse Documentation. Switch between the Dimensions and Realms map and the Main Abstract Entities map.</h1>
+
+<canvas id="stars"></canvas>
+<canvas id="trail"></canvas>
+
+<div class="wrap">
+  <p class="eyebrow">Verse documentation</p>
+  <h1>Marvel Cosmology<span class="sub">Verse Documentation</span></h1>
+  <p class="lede">An interactive reference for the planes of existence and the abstract powers that hold them together. Pick a map below to explore it.</p>
+
+  <div class="switcher" id="switcher">
+    <div class="tab-glow" id="tabGlow"></div>
+    <button class="tab active" data-target="dimensions-realms.html" id="tabDim">
+      Dimensions &amp; Realms
+      <span class="tag">Planes of existence</span>
+    </button>
+    <button class="tab" data-target="main-abstract-entities.html" id="tabEnt">
+      Main Abstract Entities
+      <span class="tag">Cosmic powers</span>
+    </button>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="frame-wrap">
+    <div class="frame-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="path" id="framePath">dimensions-realms.html</span>
+    </div>
+    <iframe id="viewer" src="dimensions-realms.html" title="Cosmology map viewer"></iframe>
+  </div>
+</div>
+
+<footer>Marvel Cosmology &mdash; fan-made documentation</footer>
+
+<script>
+// ---------- Tab switcher ----------
+const tabs = document.querySelectorAll('.tab');
+const glow = document.getElementById('tabGlow');
+const viewer = document.getElementById('viewer');
+const framePath = document.getElementById('framePath');
+
+function positionGlow(el){
+  const switcher = document.getElementById('switcher');
+  const sRect = switcher.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  glow.style.width = r.width + 'px';
+  glow.style.transform = `translateX(${r.left - sRect.left}px)`;
+}
+
+tabs.forEach(t=>{
+  t.addEventListener('click', ()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    positionGlow(t);
+    const target = t.dataset.target;
+    viewer.src = target;
+    framePath.textContent = target;
+  });
+});
+window.addEventListener('resize', ()=>{
+  const active = document.querySelector('.tab.active');
+  if(active) positionGlow(active);
+});
+window.addEventListener('load', ()=>{
+  positionGlow(document.querySelector('.tab.active'));
+});
+
+// ---------- Starfield ----------
+const starCanvas = document.getElementById('stars');
+const sctx = starCanvas.getContext('2d');
+function resizeStars(){
+  starCanvas.width = window.innerWidth;
+  starCanvas.height = document.body.scrollHeight;
+}
+function drawStars(){
+  resizeStars();
+  sctx.clearRect(0,0,starCanvas.width,starCanvas.height);
+  const count = Math.floor((starCanvas.width*starCanvas.height)/9000);
+  for(let i=0;i<count;i++){
+    const x = Math.random()*starCanvas.width;
+    const y = Math.random()*starCanvas.height;
+    const r = Math.random()*1.1 + 0.2;
+    const a = Math.random()*0.6 + 0.15;
+    sctx.beginPath();
+    sctx.arc(x,y,r,0,Math.PI*2);
+    sctx.fillStyle = `rgba(255,255,255,${a})`;
+    sctx.fill();
+  }
+}
+drawStars();
+window.addEventListener('resize', ()=>{ clearTimeout(window._rt); window._rt = setTimeout(drawStars,200); });
+
+// ---------- Mouse-reactive particle trail ----------
+const trailCanvas = document.getElementById('trail');
+const tctx = trailCanvas.getContext('2d');
+function resizeTrail(){
+  trailCanvas.width = window.innerWidth;
+  trailCanvas.height = window.innerHeight;
+}
+resizeTrail();
+window.addEventListener('resize', resizeTrail);
+
+let particles = [];
+let mouse = {x:-999, y:-999, active:false};
+const palette = ['#E9D24C','#8B90FF','#7FB8FF','#3FDE8A'];
+
+window.addEventListener('pointermove', (e)=>{
+  mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+  for(let i=0;i<2;i++){
+    particles.push({
+      x: mouse.x + (Math.random()-0.5)*6,
+      y: mouse.y + (Math.random()-0.5)*6,
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6 - 0.15,
+      life:1,
+      size: Math.random()*2 + 1,
+      color: palette[Math.floor(Math.random()*palette.length)]
+    });
+  }
+  if(particles.length > 260) particles.splice(0, particles.length-260);
+});
+window.addEventListener('pointerleave', ()=>{ mouse.active = false; });
+
+function renderTrail(){
+  tctx.clearRect(0,0,trailCanvas.width,trailCanvas.height);
+  particles.forEach(p=>{
+    p.x += p.vx; p.y += p.vy; p.life -= 0.014;
+  });
+  particles = particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    tctx.beginPath();
+    tctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);
+    tctx.fillStyle = p.color;
+    tctx.globalAlpha = Math.max(p.life,0)*0.75;
+    tctx.shadowBlur = 12;
+    tctx.shadowColor = p.color;
+    tctx.fill();
+  });
+  tctx.globalAlpha = 1;
+  tctx.shadowBlur = 0;
+  requestAnimationFrame(renderTrail);
+}
+renderTrail();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmology — New Main Abstracts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05060B;
+    --panel:#0D0F17;
+    --line:#2A2F42;
+    --text:#E9E6F3;
+    --text-dim:#8B8AA0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:'IBM Plex Sans',sans-serif;
+    color:var(--text);
+    overflow-x:hidden;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:34px 16px 50px;
+    position:relative;
+  }
+  #stars{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+  }
+  #universeShift{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    opacity:0;
+    transition: opacity .7s ease;
+    background:
+      radial-gradient(circle at 28% 24%, rgba(140,100,230,.4), transparent 55%),
+      radial-gradient(circle at 76% 68%, rgba(60,190,210,.32), transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(232,177,77,.16), transparent 62%);
+  }
+  #universeShift.active{ opacity:1; }
+  #blessingShift{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    opacity:0;
+    transition: opacity .7s ease;
+    background:
+      radial-gradient(circle at 50% 38%, rgba(255,238,180,.5), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(245,215,110,.28), transparent 65%);
+  }
+  #blessingShift.active{ opacity:1; }
+  .star{
+    position:absolute; border-radius:50%; background:#fff;
+    animation:twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:.15;} 50%{opacity:.9;} }
+
+  .head{
+    text-align:center;
+    z-index:1;
+    margin-bottom:6px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Cinzel',serif;
+    font-weight:600;
+    font-size:28px;
+    margin:0 0 8px;
+    letter-spacing:.02em;
+    background:linear-gradient(180deg,#fff, #B9B4D8 140%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .subtitle{
+    font-size:13px;
+    color:var(--text-dim);
+    margin:0 0 6px;
+  }
+  .axis-caption{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:.05em;
+    margin-bottom:18px;
+  }
+  .axis-caption span{padding:2px 8px;border-radius:20px;border:1px solid var(--line);}
+  .axis-caption .l{color:#F0B25E;}
+  .axis-caption .r{color:#8FA5E0;}
+
+  .stage-wrap{
+    position:relative;
+    max-width:960px;
+    width:100%;
+    z-index:1;
+  }
+  svg#tree{
+    width:100%;
+    height:auto;
+    display:block;
+  }
+
+  .node-box{
+    fill:var(--panel);
+    stroke-width:1.4;
+    rx:9;
+  }
+  .node-name{
+    font-family:'Cinzel',serif;
+    font-weight:600;
+    font-size:14px;
+    text-anchor:middle;
+    dominant-baseline:middle;
+    cursor:pointer;
+  }
+  .node-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    fill:var(--text-dim);
+    text-anchor:middle;
+    dominant-baseline:middle;
+    letter-spacing:.04em;
+  }
+  .node-group{cursor:pointer;}
+  .node-group .node-box{transition:filter .18s ease, stroke-opacity .18s ease;}
+  .node-group:hover .node-box{filter:brightness(1.35);}
+
+  .divine-halo{
+    animation: haloPulse 3.4s ease-in-out infinite;
+    transform-origin:center;
+  }
+  @keyframes haloPulse{
+    0%,100%{ opacity:.75; transform:scale(1); }
+    50%{ opacity:1; transform:scale(1.12); }
+  }
+
+  /* Living Tribunal — everyone jumps (handled in JS, see animate()) */
+  .inner{ transition: opacity .3s ease; }
+  .inner.dimmed{ opacity:.55; }
+  .inner.hidden{ opacity:0; }
+
+  /* Phoenix Force — flames */
+  .node-group[data-id="phoenix"] .node-box{ transition: filter .2s ease; }
+  .node-group[data-id="phoenix"].flame-active .node-box{
+    animation: flameFlicker 1.6s ease-in-out infinite;
+  }
+  @keyframes flameFlicker{
+    0%,100%{ filter: drop-shadow(0 0 5px #F0A63A) drop-shadow(0 0 12px #E0521A); }
+    50%{ filter: drop-shadow(0 0 9px #F0A63A) drop-shadow(0 0 20px #E0521A); }
+  }
+  .feather{ opacity:0; transform-box: fill-box; transform-origin: center; }
+  .node-group[data-id="phoenix"].flame-active .feather{
+    animation-name: featherFall;
+    animation-timing-function: ease-in;
+    animation-iteration-count: infinite;
+  }
+
+  .comet{ opacity:0; }
+  .node-group[data-id="phoenix"].flame-active .comet{
+    animation: cometPass 2.6s ease-out infinite;
+  }
+  @keyframes cometPass{
+    0%{ transform: translate(-170px,70px) scale(.9); opacity:0; }
+    4%{ opacity:1; }
+    20%{ transform: translate(170px,-70px) scale(1.05); opacity:1; }
+    28%{ opacity:0; }
+    100%{ opacity:0; transform: translate(170px,-70px); }
+  }
+  @keyframes featherFall{
+    0%{ transform: translate(0,0) rotate(0deg); opacity:0; }
+    8%{ opacity:.95; }
+    30%{ transform: translate(7px, 26px) rotate(18deg); }
+    55%{ transform: translate(-7px, 54px) rotate(-16deg); }
+    80%{ transform: translate(6px, 80px) rotate(14deg); opacity:.7; }
+    100%{ transform: translate(-3px, 100px) rotate(-4deg); opacity:0; }
+  }
+
+  /* Magistrati — watching eyes, hidden until hovered */
+  .magistrati-eye{
+    opacity:0;
+    transition: opacity .25s ease;
+  }
+  .node-group[data-id="magistrati"]:hover .magistrati-eye{ opacity:1; }
+  .pupil{
+    transition: transform .25s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .node-group[data-id="magistrati"]:hover .pupil{
+    animation: eyeScan 1.8s ease-in-out infinite;
+  }
+  @keyframes eyeScan{
+    0%,100%{ transform: translateX(-3px); }
+    50%{ transform: translateX(3px); }
+  }
+
+  .edge{
+    fill:none;
+    stroke:#3A4058;
+    stroke-width:1.3;
+    stroke-dasharray:3 5;
+    opacity:.75;
+  }
+
+  .tooltip{
+    position:absolute;
+    max-width:270px;
+    background:#12141F;
+    border:1px solid #313754;
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:12.5px;
+    line-height:1.55;
+    color:#DAD7EA;
+    box-shadow:0 12px 30px rgba(0,0,0,.5);
+    opacity:0;
+    transform:translateY(4px);
+    transition:opacity .12s ease, transform .12s ease;
+    pointer-events:none;
+    z-index:5;
+  }
+  .tooltip.visible{opacity:1; transform:translateY(0);}
+  .tooltip .tt-name{
+    font-family:'Cinzel',serif;
+    font-size:13.5px;
+    font-weight:600;
+    margin-bottom:2px;
+    display:block;
+  }
+  .tooltip .tt-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:#8B8AA0;
+    display:block;
+    margin-bottom:8px;
+    letter-spacing:.04em;
+  }
+  .tooltip .tt-empty{
+    font-style:italic;
+    color:#6E6C82;
+  }
+  .tooltip .tt-glitch{
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:.03em;
+    color:#E3B8EE;
+    display:inline-block;
+    animation: glitchFlicker 2.6s steps(2,end) infinite;
+    text-shadow: 1px 0 #ff4fd8, -1px 0 #4fd8ff;
+  }
+  @keyframes glitchFlicker{
+    0%,100%{ opacity:1; transform:translateX(0); }
+    46%{ opacity:1; transform:translateX(0); }
+    48%{ opacity:.55; transform:translateX(1px); }
+    50%{ opacity:1; transform:translateX(-1px); }
+    52%{ opacity:.7; transform:translateX(0); }
+    88%{ opacity:1; }
+    90%{ opacity:.4; transform:translateX(-1px); }
+    92%{ opacity:1; transform:translateX(0); }
+  }
+
+  .footnote{
+    max-width:640px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:12px;
+    line-height:1.6;
+    margin-top:22px;
+    z-index:1;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    * { animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="universeShift"></div>
+<div id="blessingShift"></div>
+<div id="stars"></div>
+
+<div class="head">
+  <div class="eyebrow">Worldbuilding Reference</div>
+  <h1>Cosmology — New Main Abstracts</h1>
+  <p class="subtitle">Hover (or tap) an entity to read its description.</p>
+  <div class="axis-caption"><span class="l">◂ Existence</span> &nbsp; <span class="r">Non-Existence ▸</span></div>
+</div>
+
+<div class="stage-wrap">
+  <svg id="tree" viewBox="0 0 940 880" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="tooltip" id="tooltip">
+    <span class="tt-name" id="ttName"></span>
+    <span class="tt-tag" id="ttTag"></span>
+    <span id="ttDesc"></span>
+  </div>
+</div>
+
+
+<script>
+// ---------- Starfield ----------
+const starsEl = document.getElementById('stars');
+for(let i=0;i<70;i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random()*1.6+0.6;
+  s.style.width = size+'px';
+  s.style.height = size+'px';
+  s.style.left = (Math.random()*100)+'%';
+  s.style.top = (Math.random()*100)+'%';
+  s.style.animationDelay = (Math.random()*4)+'s';
+  s.style.animationDuration = (3+Math.random()*3)+'s';
+  starsEl.appendChild(s);
+}
+
+// ---------- Data ----------
+const nodes = [
+  {id:'oaa', name:'The One Above All', tag:null, x:470, y:55, w:230, h:56, color:'#F5D76E',
+    desc:"Across the entire multiverse, he is the only being who is Omnipotent, Omniscient, and Omnipresent. He has no limits, and he is infinitely good. Mortals call him God; his children call him Father. He is The One Above All."},
+  {id:'tribunal', name:'The Living Tribunal', tag:null, x:470, y:170, w:230, h:56, color:'#5FB4E0',
+    desc:"The impartial cosmic judge who protects God's creation. His powers are limitless compared to the other entities, whom he rules with an iron fist. The Living Tribunal judges, and he punishes."},
+
+  {id:'magistrati', name:'Magistrati', tag:'[ Judgment ]', x:760, y:170, w:170, h:64, color:'#CFC9E8', eyes:true,
+    desc:"To be seen by them is the sign that your fate has already found its way to judgment. Be presentable — you will soon enter the hall of judgment."},
+
+  {id:'eternity', name:'Eternity / Infinity', tag:'[ Existence ]', x:225, y:300, w:240, h:64,
+    nameParts:[{t:'Eternity', c:'#9C8CF0'},{t:' / ', c:'#E9E6F3'},{t:'Infinity', c:'#E8B14D'}],
+    desc:"Space and time — one and the same thing, split into two entities: one is space, the other is time. They are the most respected beings in the multiverse, because they are the multiverse."},
+  {id:'phoenix', name:'The Phoenix Force', tag:'[ Life ]', x:225, y:420, w:215, h:64, color:'#F0A63A',
+    desc:"Older than the most powerful entities, its power brings life but can take it away as quickly as it gave it. It is not simply life — it is life's endless cycle. The power of the Phoenix Force surpasses the limits of imagination."},
+  {id:'master', name:'Master Order', tag:'[ Order ]', x:225, y:540, w:190, h:64, color:'#DDE3EA',
+    desc:"Guardian and embodiment of order in the universe. He wields many powers that let him organize the world — his influence reaches far beyond what one might imagine."},
+  {id:'power', name:'The Power That Be', tag:'[ Magic ]', x:225, y:660, w:215, h:64, color:'#C0392B',
+    desc:"The embodiment of magic in the universe. Every magical force is designed and mastered by him."},
+  {id:'love', name:'Mistress Love', tag:'[ + Emotions ]', x:225, y:780, w:195, h:64, color:'#D66FD6',
+    desc:"A powerful entity representing love and, more broadly, the positive emotional spectrum that gives life a bearable meaning. Her powers remain deeply mysterious — but her abilities are probably the most frightening of all, for mortals."},
+
+  {id:'oblivion', name:'Oblivion', tag:'[ Non-Existence ]', x:715, y:300, w:210, h:64, color:'#C77DD1',
+    glitch:true,
+    desc:"\u2584\u2591\u2593 d\u0338o\u0338e\u0338s\u0338 \u0338n\u0338o\u0338t\u0338 \u0338e\u0338x\u0338i\u0338s\u0338t\u0338 \u2592\u2588\u2591 \u2591\u2588\u2592 \u0338i\u0338s\u0338 \u0338n\u0338o\u0338t\u0338 \u2593\u2591\u2584 ...yet he is seen... \u2588\u2592\u2591\u0338c\u0338a\u0338n\u0338n\u0338o\u0338t\u0338 \u0338b\u0338e\u0338 \u0338r\u0338e\u0338a\u0338d\u0338 \u2591\u2593\u2588"},
+  {id:'death', name:'Death', tag:'[ Death ]', x:715, y:420, w:160, h:64, color:'#C9D1D9',
+    desc:"Though contained within Oblivion, she is the end of all life in the multiverse. Every soul, every consciousness dies, every hope ends its path in her realm — in the end, everyone finds their way to Mistress Death."},
+  {id:'chaos', name:'Lord Chaos', tag:'[ Chaos ]', x:715, y:540, w:190, h:64, color:'#8A97A8',
+    desc:"Chaos personified. He is what cannot be predicted and cannot be controlled — together with his brother Master Order, he represents the balance of all things."},
+  {id:'natural', name:'The Natural Order of Things', tag:'[ Science ]', x:715, y:660, w:280, h:64, color:'#5B7FDB',
+    desc:"The embodiment of science in the multiverse. All science — past, present, and future — is only a tiny fraction of his reflection through the cosmic prism of creation."},
+  {id:'hate', name:'Sir Hate', tag:'[ − Emotions ]', x:715, y:780, w:160, h:64, color:'#6E85A5',
+    desc:"A life filled only with love is not a life — hatred, rage, sorrow, and despair are what turn a good life into a perfect one. And yet he is almost as frightening as death, and often a sign of her coming."},
+];
+
+const edges = [
+  ['oaa','tribunal'],
+  ['tribunal','magistrati','side'],
+  ['tribunal','eternity'], ['tribunal','oblivion'],
+  ['eternity','phoenix'], ['phoenix','master'], ['master','power'], ['power','love'],
+  ['oblivion','death'], ['death','chaos'], ['chaos','natural'], ['natural','hate'],
+];
+
+const byId = {};
+nodes.forEach(n=>{
+  n.phaseX = Math.random()*Math.PI*2;
+  n.phaseY = Math.random()*Math.PI*2;
+  n.freqX = 0.00035 + Math.random()*0.0002;
+  n.freqY = 0.00028 + Math.random()*0.0002;
+  n.ampX = 5 + Math.random()*4;
+  n.ampY = 5 + Math.random()*4;
+  n.cx = n.x; n.cy = n.y;
+  byId[n.id] = n;
+});
+
+// ---------- Build SVG ----------
+const svgNS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('tree');
+
+function el(tag, attrs){
+  const e = document.createElementNS(svgNS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+const defs = el('defs', {});
+const glow = el('filter', {id:'divineGlow', x:'-120%', y:'-120%', width:'340%', height:'340%'});
+glow.appendChild(el('feGaussianBlur', {stdDeviation:'7', result:'blur1'}));
+glow.appendChild(el('feGaussianBlur', {in:'SourceGraphic', stdDeviation:'16', result:'blur2'}));
+const merge = el('feMerge', {});
+merge.appendChild(el('feMergeNode', {in:'blur2'}));
+merge.appendChild(el('feMergeNode', {in:'blur1'}));
+merge.appendChild(el('feMergeNode', {in:'SourceGraphic'}));
+glow.appendChild(merge);
+defs.appendChild(glow);
+
+const divineGrad = el('radialGradient', {id:'divineGrad', cx:'50%', cy:'50%', r:'50%'});
+divineGrad.appendChild(el('stop', {offset:'0%', 'stop-color':'#FFF3C4', 'stop-opacity':'0.55'}));
+divineGrad.appendChild(el('stop', {offset:'55%', 'stop-color':'#F5D76E', 'stop-opacity':'0.18'}));
+divineGrad.appendChild(el('stop', {offset:'100%', 'stop-color':'#F5D76E', 'stop-opacity':'0'}));
+defs.appendChild(divineGrad);
+
+const cometTrail = el('linearGradient', {id:'cometTrail', gradientUnits:'userSpaceOnUse', x1:-24, y1:10, x2:10, y2:-4});
+cometTrail.appendChild(el('stop', {offset:'0%', 'stop-color':'#E0521A', 'stop-opacity':'0'}));
+cometTrail.appendChild(el('stop', {offset:'55%', 'stop-color':'#F0A63A', 'stop-opacity':'0.75'}));
+cometTrail.appendChild(el('stop', {offset:'100%', 'stop-color':'#FFF3C4', 'stop-opacity':'1'}));
+defs.appendChild(cometTrail);
+
+const cometBlur = el('filter', {id:'cometBlur', x:'-200%', y:'-200%', width:'500%', height:'500%'});
+cometBlur.appendChild(el('feGaussianBlur', {stdDeviation:'1.4'}));
+defs.appendChild(cometBlur);
+
+svg.appendChild(defs);
+
+const edgeLayer = el('g', {});
+svg.appendChild(edgeLayer);
+const nodeLayer = el('g', {});
+svg.appendChild(nodeLayer);
+
+const edgeEls = edges.map(([a,b,kind])=>{
+  const path = el('path', {class:'edge'});
+  edgeLayer.appendChild(path);
+  return {a:byId[a], b:byId[b], path, kind};
+});
+
+nodes.forEach(n=>{
+  const g = el('g', {class:'node-group', 'data-id':n.id});
+
+  if(n.id === 'oaa'){
+    const halo = el('circle', {class:'divine-halo', cx:0, cy:0, r:Math.max(n.w,n.h)/2 + 26,
+      fill:'url(#divineGrad)'});
+    g.appendChild(halo);
+  }
+
+  if(n.id === 'phoenix'){
+    const comet = el('g', {class:'comet'});
+    const tail = el('line', {x1:-24, y1:10, x2:10, y2:-4, stroke:'url(#cometTrail)', 'stroke-width':3, 'stroke-linecap':'round', filter:'url(#cometBlur)'});
+    const head = el('circle', {cx:10, cy:-4, r:2.6, fill:'#FFF3C4'});
+    comet.appendChild(tail);
+    comet.appendChild(head);
+    g.appendChild(comet);
+  }
+
+  const inner = el('g', {class:'inner'});
+
+  const box = el('rect', {
+    class:'node-box', x:-n.w/2, y:-n.h/2, width:n.w, height:n.h, rx:9,
+    stroke:n.color || '#B9B4D8', 'stroke-opacity':.8
+  });
+  if(n.id === 'oaa') box.setAttribute('filter','url(#divineGlow)');
+  inner.appendChild(box);
+
+  const nameY = n.tag ? -8 : 0;
+  if(n.nameParts){
+    const text = el('text', {class:'node-name', x:0, y:nameY});
+    n.nameParts.forEach(p=>{
+      const tspan = el('tspan', {fill:p.c});
+      tspan.textContent = p.t;
+      text.appendChild(tspan);
+    });
+    inner.appendChild(text);
+  } else {
+    const text = el('text', {class:'node-name', x:0, y:nameY, fill:n.color || '#E9E6F3'});
+    text.textContent = n.name;
+    inner.appendChild(text);
+  }
+
+  if(n.tag){
+    const tag = el('text', {class:'node-tag', x:0, y:16});
+    tag.textContent = n.tag;
+    inner.appendChild(tag);
+  }
+
+  if(n.id === 'phoenix'){
+    const featherPath = "M0,-9 C3,-7 4,-2 2,5 C1,8 0,10 0,10 C0,10 -1,8 -2,5 C-4,-2 -3,-7 0,-9 Z";
+    const featherX = [-58, -26, 6, 34, 60];
+    featherX.forEach((fx,i)=>{
+      const anchor = el('g', {transform:`translate(${fx},${-n.h/2 - 6})`});
+      const feather = el('g', {class:'feather'});
+      feather.style.animationDelay = (i*0.38)+'s';
+      feather.style.animationDuration = (2.1 + i*0.17)+'s';
+      const path = el('path', {d:featherPath, fill: i%2 ? '#F0A63A' : '#E0521A'});
+      const quill = el('line', {x1:0, y1:-7, x2:0, y2:9, stroke:'#7A3B12', 'stroke-width':0.8, opacity:0.55});
+      feather.appendChild(path);
+      feather.appendChild(quill);
+      anchor.appendChild(feather);
+      inner.appendChild(anchor);
+    });
+  }
+
+  if(n.eyes){
+    [-24, 24].forEach(ex=>{
+      const eye = el('g', {class:'magistrati-eye', transform:`translate(${ex},${-n.h/2 - 14})`});
+      eye.appendChild(el('ellipse', {class:'sclera', cx:0, cy:0, rx:8, ry:5, fill:'#EDEBF7'}));
+      eye.appendChild(el('circle', {class:'pupil', cx:0, cy:0, r:2.4, fill:'#2A2438'}));
+      inner.appendChild(eye);
+    });
+  }
+
+  g.appendChild(inner);
+  nodeLayer.appendChild(g);
+  n.el = g;
+  n.inner = inner;
+
+  g.addEventListener('mouseenter', ()=>showTip(n));
+  g.addEventListener('mouseleave', ()=>hideTip());
+  g.addEventListener('click', (e)=>{ e.stopPropagation(); showTip(n, true); });
+});
+
+document.body.addEventListener('click', ()=>hideTip());
+
+// ---------- Special hover effects ----------
+let shakeUntil = -1;
+const shakePhase = {};
+nodes.forEach(n => shakePhase[n.id] = Math.random()*1000);
+byId['tribunal'].el.addEventListener('mouseenter', ()=>{
+  shakeUntil = performance.now() + 480;
+});
+
+let orderActive = false;
+byId['master'].el.addEventListener('mouseenter', ()=>{ orderActive = true; });
+byId['master'].el.addEventListener('mouseleave', ()=>{ orderActive = false; });
+
+let chaosTarget = 0, chaosT = 0;
+byId['chaos'].el.addEventListener('mouseenter', ()=>{ chaosTarget = 1; });
+byId['chaos'].el.addEventListener('mouseleave', ()=>{ chaosTarget = 0; });
+const swapPartner = {phoenix:'death', death:'phoenix', power:'natural', natural:'power', love:'hate', hate:'love'};
+
+let hateTarget = 0, hateT = 0;
+byId['hate'].el.addEventListener('mouseenter', ()=>{ hateTarget = 1; });
+byId['hate'].el.addEventListener('mouseleave', ()=>{ hateTarget = 0; });
+const hateTargets = ['natural','love','power'];
+
+let loveTarget = 0, loveT = 0;
+byId['love'].el.addEventListener('mouseenter', ()=>{ loveTarget = 1; });
+byId['love'].el.addEventListener('mouseleave', ()=>{ loveTarget = 0; });
+const loveTargets = ['power','hate','natural'];
+
+const deathTargets = ['phoenix','master','chaos'];
+byId['death'].el.addEventListener('mouseenter', ()=>{
+  deathTargets.forEach(id=> byId[id].inner.classList.add('dimmed'));
+});
+byId['death'].el.addEventListener('mouseleave', ()=>{
+  deathTargets.forEach(id=> byId[id].inner.classList.remove('dimmed'));
+});
+
+byId['phoenix'].el.addEventListener('mouseenter', ()=>{
+  const g = byId['phoenix'].el;
+  g.classList.remove('flame-active');
+  g.getBoundingClientRect(); // force reflow so the animation restarts every time
+  g.classList.add('flame-active');
+});
+byId['phoenix'].el.addEventListener('mouseleave', ()=>{
+  byId['phoenix'].el.classList.remove('flame-active');
+});
+
+const universeShift = document.getElementById('universeShift');
+byId['eternity'].el.addEventListener('mouseenter', ()=> universeShift.classList.add('active'));
+byId['eternity'].el.addEventListener('mouseleave', ()=> universeShift.classList.remove('active'));
+
+const blessingShift = document.getElementById('blessingShift');
+byId['oaa'].el.addEventListener('mouseenter', ()=> blessingShift.classList.add('active'));
+byId['oaa'].el.addEventListener('mouseleave', ()=> blessingShift.classList.remove('active'));
+
+const oblivionSpared = ['oblivion','tribunal','oaa'];
+byId['oblivion'].el.addEventListener('mouseenter', ()=>{
+  nodes.forEach(n=>{ if(!oblivionSpared.includes(n.id)) n.inner.classList.add('hidden'); });
+});
+byId['oblivion'].el.addEventListener('mouseleave', ()=>{
+  nodes.forEach(n=> n.inner.classList.remove('hidden'));
+});
+
+// ---------- Tooltip ----------
+const tooltip = document.getElementById('tooltip');
+const ttName = document.getElementById('ttName');
+const ttTag = document.getElementById('ttTag');
+const ttDesc = document.getElementById('ttDesc');
+const stageWrap = document.querySelector('.stage-wrap');
+
+function showTip(n){
+  ttName.textContent = n.name;
+  ttTag.textContent = n.tag || '';
+  ttTag.style.display = n.tag ? 'block' : 'none';
+  if(n.glitch){
+    ttDesc.textContent = n.desc;
+    ttDesc.className = 'tt-glitch';
+  } else if(n.desc){
+    ttDesc.textContent = n.desc;
+    ttDesc.className = '';
+  } else {
+    ttDesc.textContent = 'No description provided yet.';
+    ttDesc.className = 'tt-empty';
+  }
+
+  const wrapRect = stageWrap.getBoundingClientRect();
+  const nodeRect = n.el.getBoundingClientRect();
+  let left = nodeRect.left - wrapRect.left + nodeRect.width/2 - 135;
+  let top = nodeRect.top - wrapRect.top - 12;
+  const placeBelow = top < 10;
+  if(placeBelow) top = nodeRect.bottom - wrapRect.top + 12;
+  left = Math.max(6, Math.min(left, wrapRect.width - 276));
+  tooltip.style.left = left+'px';
+  tooltip.style.top = (placeBelow ? top : top - tooltip.offsetHeight) + 'px';
+  tooltip.classList.add('visible');
+}
+function hideTip(){ tooltip.classList.remove('visible'); }
+
+// ---------- Idle float animation ----------
+function animate(t){
+  chaosT += (chaosTarget - chaosT) * 0.09;
+  hateT += (hateTarget - hateT) * 0.09;
+  loveT += (loveTarget - loveT) * 0.09;
+
+  nodes.forEach(n=>{
+    if(orderActive){
+      n.cx = n.x;
+      n.cy = n.y;
+      n.el.setAttribute('transform', `translate(${n.cx},${n.cy})`);
+      return;
+    }
+
+    let baseX = n.x, baseY = n.y;
+
+    const partnerId = swapPartner[n.id];
+    if(partnerId && chaosT > 0.001){
+      const p = byId[partnerId];
+      baseX += (p.x - n.x) * chaosT;
+      baseY += (p.y - n.y) * chaosT;
+    }
+
+    if(hateTargets.includes(n.id) && hateT > 0.001){
+      const hate = byId['hate'];
+      const dx = n.x - hate.x, dy = n.y - hate.y;
+      const dist = Math.hypot(dx,dy) || 1;
+      const push = 55 * hateT;
+      baseX += (dx/dist) * push;
+      baseY += (dy/dist) * push;
+    }
+
+    if(loveTargets.includes(n.id) && loveT > 0.001){
+      const love = byId['love'];
+      const dx = love.x - n.x, dy = love.y - n.y;
+      const dist = Math.hypot(dx,dy) || 1;
+      const pull = 45 * loveT;
+      baseX += (dx/dist) * pull;
+      baseY += (dy/dist) * pull;
+    }
+
+    n.cx = baseX + Math.sin(t*n.freqX + n.phaseX) * n.ampX;
+    n.cy = baseY + Math.cos(t*n.freqY + n.phaseY) * n.ampY;
+
+    let rot = 0;
+    if(n.id !== 'oaa' && t < shakeUntil){
+      const remaining = shakeUntil - t;
+      const k = remaining / 480; // 1 -> 0
+      const f = shakePhase[n.id];
+      n.cx += Math.sin(t*0.08 + f) * 9 * k;
+      n.cy += Math.cos(t*0.11 + f) * 7 * k;
+      rot = Math.sin(t*0.14 + f) * 6 * k;
+    }
+    n.el.setAttribute('transform', `translate(${n.cx},${n.cy}) rotate(${rot})`);
+  });
+  edgeEls.forEach(({a,b,path,kind})=>{
+    if(kind === 'side'){
+      const ax = a.cx + a.w/2, ay = a.cy;
+      const bx = b.cx - b.w/2, by = b.cy;
+      const midX = (ax+bx)/2;
+      if(orderActive){
+        path.setAttribute('d', `M ${ax} ${ay} L ${bx} ${by}`);
+      } else {
+        path.setAttribute('d', `M ${ax} ${ay} C ${midX} ${ay}, ${midX} ${by}, ${bx} ${by}`);
+      }
+      return;
+    }
+    const ax=a.cx, ay=a.cy+a.h/2, bx=b.cx, by=b.cy-b.h/2;
+    if(orderActive){
+      path.setAttribute('d', `M ${ax} ${ay} L ${bx} ${by}`);
+    } else {
+      const midY = (ay+by)/2;
+      path.setAttribute('d', `M ${ax} ${ay} C ${ax} ${midY}, ${bx} ${midY}, ${bx} ${by}`);
+    }
+  });
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
